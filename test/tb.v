@@ -26,7 +26,7 @@ module tb ();
   wire VGND = 1'b0;
 `endif
 
-  // Instantiate DUT
+  // DUT Instance
   tt_um_example user_project (
 
 `ifdef GL_TEST
@@ -45,45 +45,20 @@ module tb ();
   );
 
   // Clock generation
-  always #5 clk = ~clk;
-
-  integer i;
-
   initial begin
-
-    // Initialize signals
     clk = 0;
-    rst_n = 0;
-    ena = 1;
-    ui_in = 0;
-    uio_in = 0;
+    forever #5 clk = ~clk;
+  end
 
-    // Apply reset
-    #10;
-    rst_n = 1;
-
-    $display(" A B Cin | Sum Cout ");
-    $display("--------------------");
-
-    // Test all combinations
-    for (i = 0; i < 8; i = i + 1) begin
-
-      ui_in[0] = i[0]; // A
-      ui_in[1] = i[1]; // B
-      ui_in[2] = i[2]; // Cin
-
-      #10;
-
-      $display(" %b %b  %b  |  %b    %b",
-                ui_in[0],
-                ui_in[1],
-                ui_in[2],
-                uo_out[0],   // Sum
-                uo_out[1]);  // Cout
-    end
+  // Initialize inputs
+  initial begin
+    ena = 1'b1;
+    rst_n = 1'b0;
+    ui_in = 8'b0;
+    uio_in = 8'b0;
 
     #20;
-    $finish;
+    rst_n = 1'b1;
   end
 
 endmodule
