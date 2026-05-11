@@ -2,39 +2,67 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+from cocotb.triggers import Timer
 
 
 @cocotb.test()
-async def test_project(dut):
-    dut._log.info("Start")
+async def test_full_adder(dut):
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, unit="us")
-    cocotb.start_soon(clock.start())
+    dut._log.info("Starting Full Adder Test")
 
-    # Reset
-    dut._log.info("Reset")
+    # Initialize signals
     dut.ena.value = 1
+    dut.rst_n.value = 0
     dut.ui_in.value = 0
     dut.uio_in.value = 0
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
+    dut.clk.value = 0
+
+    # Reset delay
+    await Timer(20, unit="ns")
+
+    # Release reset
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+    # Full Adder test vectors
+    test_vectors = [
+        # A B Cin Sum Cout
+        (0, 0, 0, 0, 0),
+        (0, 0, 1, 1, 0),
+        (0, 1, 0, 1, 0),
+        (0, 1, 1, 0, 1),
+        (1, 0, 0, 1, 0),
+        (1, 0, 1, 0, 1),
+        (1, 1, 0, 0, 1),
+        (1, 1, 1, 1, 1),
+    ]
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    # Apply all inputs
+    for A, B, Cin, exp_sum, exp_cout in test_vectors:
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+        # Apply inputs
+        dut.ui_in.value = (Cin << 2) | (B << 1) | A
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+        # Wait for propagation
+        await Timer(10, unit="ns")
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+        # Read outputs
+        sum_out = int(dut.uo_out.value[0])
+        cout_out = int(dut.uo_out.value[1])
+
+        dut._log.info(
+            f"A={A} B={B} Cin={Cin} "
+            f"=> Sum={sum_out} Cout={cout_out}"
+        )
+
+        # Assertions
+        assert sum_out == exp_sum, (
+            f"SUM ERROR for A={A}, B={B}, Cin={Cin}"
+        )
+
+        assert cout_out == exp_cout, (
+            f"COUT ERROR for A={A}, B={B}, Cin={Cin}"
+        )
+
+    dut._log.info("All Full Adder test cases passed!")
+
+    await Timer(20, unit="ns")
