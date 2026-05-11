@@ -1,20 +1,43 @@
-<!---
+How it works
 
-This file is used to generate your project datasheet. Please fill in the information below and delete any unused
-sections.
+This project implements a 1-bit Full Adder using combinational logic.
+The Full Adder adds three 1-bit binary inputs: A, B, and Carry-in (Cin).
+It produces two outputs: Sum and Carry-out (Cout).
 
-You can also include images in this folder and reference them in the markdown. Each image must be less than
-512 kb in size, and the combined size of all images must be less than 1 MB.
--->
+The Sum output is generated using XOR logic, and the Carry-out is generated using AND-OR logic.
 
-## How it works
+Inputs:
 
-Explain how your project works
+ui_in[0] → A
+ui_in[1] → B
+ui_in[2] → Cin
 
-## How to test
+Outputs:
 
-Explain how to use your project
+uo_out[0] → Sum
+uo_out[1] → Cout
+How to test
 
-## External hardware
+Apply different combinations of binary inputs to A, B, and Cin through ui_in.
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+Verify the outputs:
+
+Sum on uo_out[0]
+Carry-out on uo_out[1]
+
+Example:
+
+A = 1
+B = 1
+Cin = 0
+
+Expected Output:
+
+Sum = 0
+Cout = 1
+
+Run simulation using the provided testbench to verify all input combinations.
+
+External hardware
+
+No external hardware is required for this project.
